@@ -174,13 +174,13 @@
       <div class="field"><label for="p">p</label><input id="p" type="text" value="2/3" inputmode="text"><div class="err-msg" id="p-err"></div></div>
       <div class="field"><label for="q">q</label><input id="q" type="text" value="1/3" inputmode="text"><div class="err-msg" id="q-err"></div></div>
       <div class="field"><label for="a1">a₁</label><input id="a1" type="text" value="5" inputmode="text"><div class="err-msg" id="a1-err"></div></div>
-      <div class="field"><button id="calcBtn">a₁〜a₁₀ を計算</button></div>
+      <div class="field"><button id="calcBtn">a₁〜a₇ を計算</button></div>
       <p class="format-hint">入力形式: 整数 <code>-5</code> ／ 小数 <code>1.25</code> ／ 分数 <code>3/4</code>, <code>-7/2</code></p>
     </div>
   </section>
 
   <section id="sequenceSection" class="hidden">
-    <p class="section-title"><span class="num">2</span>数列 a₁〜a₁₀ (厳密な分数)</p>
+    <p class="section-title"><span class="num">2</span>数列 a₁〜a₇ (厳密な分数)</p>
     <table id="seqTable"></table>
   </section>
 
@@ -190,7 +190,7 @@
       <div class="field"><label for="alpha">α</label><input id="alpha" type="text" value="1" inputmode="text"><div class="err-msg" id="alpha-err"></div></div>
       <div class="field"><button id="alphaBtn">α を引いて判定</button></div>
     </div>
-    <p class="hint">a₁−α, a₂−α, … , a₁₀−α を厳密な分数のまま計算し、等比数列かどうかを正確に判定します(浮動小数点誤差なし)。</p>
+    <p class="hint">a₁−α, a₂−α, … , a₇−α を厳密な分数のまま計算し、等比数列かどうかを正確に判定します(浮動小数点誤差なし)。</p>
   </section>
 
   <section id="betaSection" class="hidden">
@@ -294,9 +294,7 @@ function readField(id){
 }
 
 function fracCell(f){
-  const dec = f.toDecimal();
-  const showApprox = f.d !== 1n;
-  return `<span class="frac">${f.toFracString()}${showApprox ? `<span class="approx">≈ ${dec}</span>` : ''}</span>`;
+  return `<span class="frac">${f.toFracString()}</span>`;
 }
 
 /* ---------- アプリのロジック ---------- */
@@ -309,7 +307,7 @@ function calcSequence(){
   }catch(e){ return; }
 
   sequence = [a1];
-  for (let i=1; i<10; i++){
+  for (let i=1; i<7; i++){
     sequence.push(sequence[i-1].mul(p).add(q));
   }
 
