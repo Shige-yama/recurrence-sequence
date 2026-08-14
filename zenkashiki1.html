@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>漸化式ノート — aₙ₊₁ = p・aₙ + q</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Zen+Old+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF9F4;
+    --paper-edge:#F1EFE6;
+    --grid:#DCE3EC;
+    --ink:#26324A;
+    --ink-soft:#5B657C;
+    --pen-blue:#3B5BA5;
+    --pen-blue-soft:#7C93C4;
+    --red:#D6483C;
+    --red-dark:#AE352B;
+    --gold:#C9A227;
+    --err:#B23A2F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15px 15px, #00000008 1px, transparent 1px) 0 0/30px 30px,
+      var(--paper-edge);
+    font-family:'Noto Sans JP', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding:32px 16px 80px;
+  }
+  .page{
+    max-width:800px;
+    margin:0 auto;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, var(--grid) 28px),
+      repeating-linear-gradient(90deg, transparent, transparent 27px, var(--grid) 28px),
+      var(--paper);
+    border-radius:6px;
+    box-shadow:0 1px 2px rgba(38,50,74,.06), 0 12px 32px rgba(38,50,74,.10);
+    position:relative;
+    padding:44px 40px 48px 68px;
+    overflow:hidden;
+  }
+  .spiral{
+    position:absolute; left:0; top:0; bottom:0; width:36px;
+    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
+    background:linear-gradient(90deg, #00000006, transparent 60%);
+  }
+  .spiral span{
+    width:14px;height:14px;border-radius:50%;
+    background:var(--paper);
+    border:2px solid #C9C3B2;
+    box-shadow:inset 0 0 0 3px var(--paper-edge);
+  }
+  header{margin-bottom:28px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:.14em; color:var(--pen-blue);
+    text-transform:uppercase; margin:0 0 6px;
+  }
+  h1{
+    font-family:'Klee One', cursive;
+    font-size:29px; font-weight:600; color:var(--ink);
+    margin:0 0 4px; line-height:1.35;
+  }
+  h1 .math{
+    font-family:'JetBrains Mono', monospace; font-weight:700;
+    color:var(--pen-blue); font-size:.82em;
+  }
+  .sub{font-size:13.5px; color:var(--ink-soft); margin:0;}
+  section{margin-top:30px;}
+  .section-title{
+    font-family:'Zen Old Mincho', serif;
+    font-weight:700; font-size:15px; color:var(--ink);
+    display:flex; align-items:baseline; gap:8px; margin:0 0 14px;
+  }
+  .section-title .num{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--gold); font-size:13px; font-weight:700;
+    border:1.5px solid var(--gold); border-radius:50%;
+    width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center;
+    flex:0 0 auto;
+  }
+  .field-row{display:flex; flex-wrap:wrap; gap:20px 28px; align-items:flex-start;}
+  .field{display:flex; flex-direction:column; gap:6px;}
+  .field label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px; font-weight:700; color:var(--pen-blue);
+  }
+  .field input{
+    width:140px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:16px; color:var(--ink);
+    padding:8px 10px;
+    border:none; border-bottom:2px solid var(--pen-blue-soft);
+    background:transparent;
+    outline:none;
+    transition:border-color .15s;
+  }
+  .field input:focus{border-bottom-color:var(--pen-blue);}
+  .field input.invalid{border-bottom-color:var(--err); color:var(--err);}
+  .field .err-msg{font-size:11px; color:var(--err); min-height:14px;}
+  .format-hint{
+    width:100%; font-size:11.5px; color:var(--ink-soft);
+    margin-top:-6px;
+  }
+  button{
+    font-family:'Noto Sans JP', sans-serif;
+    font-weight:700; font-size:14px;
+    color:#fff; background:var(--pen-blue);
+    border:none; border-radius:4px;
+    padding:11px 22px; cursor:pointer;
+    box-shadow:0 2px 0 #2c4172, 0 4px 10px rgba(59,91,165,.25);
+    transition:transform .08s ease, box-shadow .08s ease;
+    align-self:flex-end;
+    margin-top:auto;
+  }
+  button:active{transform:translateY(2px); box-shadow:0 0 0 rgba(0,0,0,0);}
+
+  table{border-collapse:collapse; width:100%; margin-top:4px;}
+  th, td{
+    text-align:center; padding:9px 4px;
+    border-bottom:1px solid var(--grid);
+    vertical-align:middle;
+  }
+  th{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--ink-soft); font-weight:600; font-size:12px;
+    letter-spacing:.05em; white-space:nowrap;
+  }
+  td.val{color:var(--ink); font-weight:600;}
+  .frac{font-family:'JetBrains Mono', monospace; font-size:14.5px;}
+  .frac .approx{display:block; font-size:10.5px; color:var(--ink-soft); font-weight:400; margin-top:2px;}
+  tr:first-child th{border-top:1px solid var(--grid);}
+
+  sub{ font-size:0.68em; vertical-align:-0.35em; }
+  h1 .math sub{ font-size:0.6em; }
+  .hint{font-size:12.5px; color:var(--ink-soft); margin-top:10px; line-height:1.6;}
+  .hidden{display:none !important;}
+
+  .verdict-wrap{margin-top:22px; display:flex; align-items:center; gap:22px; flex-wrap:wrap;}
+  .stamp{width:88px; height:88px; flex:0 0 auto;}
+  .stamp svg{width:100%; height:100%; display:block;}
+  .verdict-text{font-size:14px; color:var(--ink); line-height:1.7;}
+  .verdict-text strong{font-family:'JetBrains Mono', monospace; color:var(--red-dark);}
+  .verdict-text.ok strong{color:var(--pen-blue);}
+
+  @media (max-width:560px){
+    .page{padding:36px 20px 40px 52px;}
+    h1{font-size:22px;}
+    .field input{width:118px;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="spiral">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <header>
+    <p class="eyebrow">Recurrence Relation Notebook</p>
+    <h1>漸化式ノート <span class="math">a<sub>n+1</sub> = p・a<sub>n</sub> + q</span></h1>
+    <p class="sub">p, q, a₁, α はすべて分数(例 <code>3/4</code>)や小数(例 <code>1.5</code>)で入力できます。計算はBigIntによる厳密な分数演算なので誤差は出ません。</p>
+  </header>
+
+  <section>
+    <p class="section-title"><span class="num">1</span>p, q, a₁ を入力</p>
+    <div class="field-row">
+      <div class="field"><label for="p">p</label><input id="p" type="text" value="2/3" inputmode="text"><div class="err-msg" id="p-err"></div></div>
+      <div class="field"><label for="q">q</label><input id="q" type="text" value="1/3" inputmode="text"><div class="err-msg" id="q-err"></div></div>
+      <div class="field"><label for="a1">a₁</label><input id="a1" type="text" value="5" inputmode="text"><div class="err-msg" id="a1-err"></div></div>
+      <div class="field"><button id="calcBtn">a₁〜a₁₀ を計算</button></div>
+      <p class="format-hint">入力形式: 整数 <code>-5</code> ／ 小数 <code>1.25</code> ／ 分数 <code>3/4</code>, <code>-7/2</code></p>
+    </div>
+  </section>
+
+  <section id="sequenceSection" class="hidden">
+    <p class="section-title"><span class="num">2</span>数列 a₁〜a₁₀ (厳密な分数)</p>
+    <table id="seqTable"></table>
+  </section>
+
+  <section id="alphaInputSection" class="hidden">
+    <p class="section-title"><span class="num">3</span>定数 α を入力</p>
+    <div class="field-row">
+      <div class="field"><label for="alpha">α</label><input id="alpha" type="text" value="1" inputmode="text"><div class="err-msg" id="alpha-err"></div></div>
+      <div class="field"><button id="alphaBtn">α を引いて判定</button></div>
+    </div>
+    <p class="hint">a₁−α, a₂−α, … , a₁₀−α を厳密な分数のまま計算し、等比数列かどうかを正確に判定します(浮動小数点誤差なし)。</p>
+  </section>
+
+  <section id="betaSection" class="hidden">
+    <p class="section-title"><span class="num">4</span>b<sub>n</sub> = a<sub>n</sub> − α の数列と判定</p>
+    <table id="betaTable"></table>
+    <div class="verdict-wrap">
+      <div class="stamp" id="stampArea"></div>
+      <div class="verdict-text" id="verdictText"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+/* ---------- 厳密な分数(BigInt)クラス ---------- */
+function bgcd(a,b){
+  a = a < 0n ? -a : a;
+  b = b < 0n ? -b : b;
+  while (b) { [a,b] = [b, a % b]; }
+  return a === 0n ? 1n : a;
+}
+
+class Frac {
+  constructor(num, den = 1n){
+    if (den === 0n) throw new Error('分母が0です');
+    if (den < 0n) { num = -num; den = -den; }
+    const g = bgcd(num, den);
+    this.n = num / g;
+    this.d = den / g;
+  }
+  add(o){ return new Frac(this.n*o.d + o.n*this.d, this.d*o.d); }
+  sub(o){ return new Frac(this.n*o.d - o.n*this.d, this.d*o.d); }
+  mul(o){ return new Frac(this.n*o.n, this.d*o.d); }
+  div(o){ if (o.n === 0n) throw new Error('0で割ることはできません'); return new Frac(this.n*o.d, this.d*o.n); }
+  isZero(){ return this.n === 0n; }
+  equals(o){ return this.n*o.d === o.n*this.d; }
+  toDecimal(maxDigits = 8){
+    const neg = (this.n < 0n) !== (this.d < 0n);
+    let n = this.n < 0n ? -this.n : this.n;
+    const d = this.d < 0n ? -this.d : this.d;
+    const intPart = n / d;
+    let rem = n % d;
+    if (rem === 0n) return (neg && intPart !== 0n ? '-' : '') + intPart.toString();
+    let digits = '';
+    for (let i=0; i<maxDigits && rem !== 0n; i++){
+      rem *= 10n;
+      digits += (rem / d).toString();
+      rem = rem % d;
+    }
+    const truncated = rem !== 0n;
+    return (neg ? '-' : '') + intPart.toString() + '.' + digits + (truncated ? '…' : '');
+  }
+  toFracString(){ return this.d === 1n ? this.n.toString() : `${this.n}/${this.d}`; }
+}
+
+/* ---------- 入力文字列 → Frac へのパース ---------- */
+const DEC_RE = /^[+-]?\d+(\.\d+)?$/;
+
+function parseDecimalToFrac(str){
+  str = str.trim();
+  if (!DEC_RE.test(str)) throw new Error('数値として認識できません');
+  let sign = 1n;
+  if (str[0] === '-') { sign = -1n; str = str.slice(1); }
+  else if (str[0] === '+') { str = str.slice(1); }
+  if (str.includes('.')){
+    const [intPart, fracPart] = str.split('.');
+    const denom = 10n ** BigInt(fracPart.length);
+    const numer = BigInt((intPart === '' ? '0' : intPart) + fracPart);
+    return new Frac(sign * numer, denom);
+  }
+  return new Frac(sign * BigInt(str === '' ? '0' : str), 1n);
+}
+
+function parseRational(str){
+  str = (str || '').trim();
+  if (str === '') throw new Error('未入力です');
+  if (str.includes('/')){
+    const parts = str.split('/');
+    if (parts.length !== 2) throw new Error('分数は a/b の形で入力してください');
+    const numF = parseDecimalToFrac(parts[0]);
+    const denF = parseDecimalToFrac(parts[1]);
+    return numF.div(denF);
+  }
+  return parseDecimalToFrac(str);
+}
+
+function readField(id){
+  const input = $(id);
+  const errEl = $(id + '-err');
+  try{
+    const f = parseRational(input.value);
+    input.classList.remove('invalid');
+    errEl.textContent = '';
+    return f;
+  }catch(e){
+    input.classList.add('invalid');
+    errEl.textContent = e.message;
+    throw e;
+  }
+}
+
+function fracCell(f){
+  const dec = f.toDecimal();
+  const showApprox = f.d !== 1n;
+  return `<span class="frac">${f.toFracString()}${showApprox ? `<span class="approx">≈ ${dec}</span>` : ''}</span>`;
+}
+
+/* ---------- アプリのロジック ---------- */
+let sequence = [];
+
+function calcSequence(){
+  let p, q, a1;
+  try{
+    p = readField('p'); q = readField('q'); a1 = readField('a1');
+  }catch(e){ return; }
+
+  sequence = [a1];
+  for (let i=1; i<10; i++){
+    sequence.push(sequence[i-1].mul(p).add(q));
+  }
+
+  let html = '<tr><th>n</th>' + sequence.map((_,i)=>`<th>${i+1}</th>`).join('') + '</tr>';
+  html += '<tr><th>a<sub>n</sub></th>' + sequence.map(v=>`<td class="val">${fracCell(v)}</td>`).join('') + '</tr>';
+  $('seqTable').innerHTML = html;
+
+  $('sequenceSection').classList.remove('hidden');
+  $('alphaInputSection').classList.remove('hidden');
+  $('betaSection').classList.add('hidden');
+}
+
+function checkGeometric(b){
+  const zeroCount = b.filter(v => v.isZero()).length;
+  if (zeroCount > 0){
+    return { ok:false, ratio:null, reason: zeroCount === b.length
+      ? 'すべての項が 0 になりました。0 の列は等比数列とは呼びません。'
+      : '一部の項が 0 になり、公比が定義できません。' };
+  }
+  const r = b[1].div(b[0]);
+  for (let i=0; i<b.length-1; i++){
+    const expected = r.mul(b[i]);
+    if (!expected.equals(b[i+1])){
+      return { ok:false, ratio:null, reason:'各項の比が一定になりませんでした。' };
+    }
+  }
+  return { ok:true, ratio:r, reason:null };
+}
+
+function calcBeta(){
+  if (sequence.length === 0) return;
+  let alpha;
+  try{ alpha = readField('alpha'); }catch(e){ return; }
+
+  const b = sequence.map(v => v.sub(alpha));
+
+  let html = '<tr><th>n</th>' + b.map((_,i)=>`<th>${i+1}</th>`).join('') + '</tr>';
+  html += '<tr><th>b<sub>n</sub>=a<sub>n</sub>−α</th>' + b.map(v=>`<td class="val">${fracCell(v)}</td>`).join('') + '</tr>';
+  $('betaTable').innerHTML = html;
+
+  const result = checkGeometric(b);
+  renderStamp(result.ok);
+
+  const verdictEl = $('verdictText');
+  if (result.ok){
+    verdictEl.className = 'verdict-text ok';
+    verdictEl.innerHTML = `b<sub>n</sub> は<strong>等比数列</strong>です。公比 r = <strong>${result.ratio.toFracString()}</strong>${result.ratio.d!==1n? ` (≈ ${result.ratio.toDecimal()})`:''}`;
+  } else {
+    verdictEl.className = 'verdict-text';
+    verdictEl.innerHTML = `b<sub>n</sub> は<strong>等比数列ではありません</strong>。${result.reason}`;
+  }
+
+  $('betaSection').classList.remove('hidden');
+}
+
+function renderStamp(ok){
+  const svg = ok ? stampCircleSVG() : stampCrossSVG();
+  $('stampArea').innerHTML = svg;
+  const el = $('stampArea').firstElementChild;
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = 'stampIn .28s ease-out';
+}
+
+function stampCircleSVG(){
+  return `<svg viewBox="0 0 100 100" style="transform:rotate(-6deg)">
+    <path d="M50 12 C74 10, 90 26, 88 50 C86 76, 68 90, 46 88 C22 86, 10 68, 12 44 C14 22, 30 14, 50 12 Z"
+      fill="none" stroke="#D6483C" stroke-width="6" stroke-linecap="round" opacity="0.92"/>
+  </svg>
+  <style>@keyframes stampIn{0%{transform:scale(2.4) rotate(-6deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(-6deg);opacity:1}}</style>`;
+}
+function stampCrossSVG(){
+  return `<svg viewBox="0 0 100 100" style="transform:rotate(-4deg)">
+    <path d="M16 18 C40 42, 56 58, 84 84" fill="none" stroke="#D6483C" stroke-width="7" stroke-linecap="round"/>
+    <path d="M85 20 C60 42, 42 60, 15 85" fill="none" stroke="#D6483C" stroke-width="7" stroke-linecap="round"/>
+  </svg>
+  <style>@keyframes stampIn{0%{transform:scale(2.4) rotate(-4deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(-4deg);opacity:1}}</style>`;
+}
+
+$('calcBtn').addEventListener('click', calcSequence);
+$('alphaBtn').addEventListener('click', calcBeta);
+</script>
+</body>
+</html>
