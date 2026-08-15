@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>漸化式を視覚的に理解しよう</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        "Yu Gothic",
+        "Hiragino Kaku Gothic ProN",
+        Meiryo,
+        sans-serif;
+
+    background: #f4f7fb;
+    color: #222;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 20px 50px;
+}
+
+h1 {
+    text-align: center;
+    color: #1f3c88;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.step-title {
+    color: #1f3c88;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.formula {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin: 15px 0 25px;
+}
+
+.inputs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.alpha-area {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    border: 2px solid #ccd4e0;
+    border-radius: 8px;
+    text-align: center;
+}
+
+input:focus {
+    outline: none;
+    border-color: #3973d9;
+}
+
+.button-area {
+    text-align: center;
+    margin-top: 25px;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 13px 35px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+
+.button-step1 {
+    background: #3973d9;
+}
+
+.button-step1:hover {
+    background: #285db8;
+}
+
+.button-step2 {
+    background: #e58b22;
+}
+
+.button-step2:hover {
+    background: #c96f0c;
+}
+
+button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+}
+
+.sequence-table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 700px;
+}
+
+th,
+td {
+    border: 1px solid #cbd3df;
+    padding: 12px 15px;
+    text-align: center;
+}
+
+th {
+    background: #eaf0fa;
+}
+
+td.value {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.sub-sequence {
+    background: #fff8df;
+}
+
+.result {
+    text-align: center;
+    padding: 25px;
+    border-radius: 12px;
+    background: #f1f5ff;
+}
+
+.result-mark {
+    font-size: 60px;
+    font-weight: bold;
+    margin: 10px;
+}
+
+.result-text {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.ratio {
+    margin-top: 15px;
+    font-size: 18px;
+}
+
+.explanation {
+    margin-top: 20px;
+    line-height: 1.8;
+    background: #f8f8f8;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.error {
+    color: #c62828;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.info {
+    text-align: center;
+    color: #555;
+    margin-top: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 700px) {
+
+    .inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .formula {
+        font-size: 22px;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>漸化式を視覚的に理解しよう</h1>
+
+
+    <!-- ========================================= -->
+    <!-- STEP 1 -->
+    <!-- ========================================= -->
+
+    <div class="card">
+
+        <div class="step-title">
+            STEP 1　数列を計算する
+        </div>
+
+        <div class="formula">
+            a<sub>n+1</sub> = p a<sub>n</sub> + q
+        </div>
+
+
+        <div class="inputs">
+
+            <div class="input-group">
+
+                <label for="p">
+                    p
+                </label>
+
+                <input
+                    type="text"
+                    id="p"
+                    value="2"
+                    placeholder="例：2 または 1/2"
+                >
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label for="q">
+                    q
+                </label>
+
+                <input
+                    type="text"
+                    id="q"
+                    value="3"
+                    placeholder="例：3 または -3/4"
+                >
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label for="a1">
+                    a₁
+                </label>
+
+                <input
+                    type="text"
+                    id="a1"
+                    value="1"
+                    placeholder="例：1 または 5/2"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="button-area">
+
+            <button
+                class="button-step1"
+                onclick="calculateSequence()"
+            >
+                ① 数列を計算する
+            </button>
+
+        </div>
+
+
+        <div
+            id="error-step1"
+            class="error"
+        ></div>
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- 数列 a_n -->
+    <!-- ========================================= -->
+
+    <div
+        id="sequence-card"
+        class="card hidden"
+    >
+
+        <h2>
+            数列 {aₙ}
+        </h2>
+
+        <div class="sequence-table-wrapper">
+
+            <table>
+
+                <tr id="n-row">
+
+                    <th>
+                        n
+                    </th>
+
+                </tr>
+
+
+                <tr id="a-row">
+
+                    <th>
+                        aₙ
+                    </th>
+
+                </tr>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- STEP 2 -->
+    <!-- ========================================= -->
+
+    <div
+        id="step2-card"
+        class="card hidden"
+    >
+
+        <div class="step-title">
+            STEP 2　αを決めて調べる
+        </div>
+
+
+        <div class="info">
+            αを入力すると、aₙ − α が等比数列になるか調べます。
+        </div>
+
+
+        <div class="alpha-area">
+
+            <div class="input-group">
+
+                <label for="alpha">
+                    α
+                </label>
+
+                <input
+                    type="text"
+                    id="alpha"
+                    placeholder="例：-3 または 1/2"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="button-area">
+
+            <button
+                class="button-step2"
+                onclick="checkAlpha()"
+            >
+                ② αを決めて判定する
+            </button>
+
+        </div>
+
+
+        <div
+            id="error-step2"
+            class="error"
+        ></div>
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- a_n - alpha -->
+    <!-- ========================================= -->
+
+    <div
+        id="shifted-card"
+        class="card hidden"
+    >
+
+        <h2>
+            αを引いた数列 {aₙ − α}
+        </h2>
+
+
+        <div class="sequence-table-wrapper">
+
+            <table>
+
+                <tr id="sub-n-row">
+
+                    <th>
+                        n
+                    </th>
+
+                </tr>
+
+
+                <tr id="sub-a-row">
+
+                    <th>
+                        aₙ − α
+                    </th>
+
+                </tr>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- 判定結果 -->
+    <!-- ========================================= -->
+
+    <div
+        id="result-card"
+        class="card hidden"
+    >
+
+        <h2>
+            等比数列かどうか
+        </h2>
+
+
+        <div class="result">
+
+            <div
+                id="result-mark"
+                class="result-mark"
+            >
+            </div>
+
+
+            <div
+                id="result-text"
+                class="result-text"
+            >
+            </div>
+
+
+            <div
+                id="ratio"
+                class="ratio"
+            >
+            </div>
+
+        </div>
+
+
+        <div
+            id="explanation"
+            class="explanation"
+        >
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+
+// =====================================================
+// 分数を扱うための「Fraction」クラス
+// =====================================================
+
+class Fraction {
+
+    constructor(numerator, denominator = 1) {
+
+        if (denominator === 0) {
+            throw new Error("分母を0にすることはできません。");
+        }
+
+
+        // 分母を正にする
+        if (denominator < 0) {
+
+            numerator *= -1;
+            denominator *= -1;
+        }
+
+
+        const gcdValue =
+            gcd(
+                Math.abs(numerator),
+                Math.abs(denominator)
+            );
+
+
+        this.n =
+            numerator / gcdValue;
+
+        this.d =
+            denominator / gcdValue;
+    }
+
+
+    add(other) {
+
+        return new Fraction(
+            this.n * other.d +
+            other.n * this.d,
+
+            this.d * other.d
+        );
+    }
+
+
+    subtract(other) {
+
+        return new Fraction(
+            this.n * other.d -
+            other.n * this.d,
+
+            this.d * other.d
+        );
+    }
+
+
+    multiply(other) {
+
+        return new Fraction(
+            this.n * other.n,
+
+            this.d * other.d
+        );
+    }
+
+
+    divide(other) {
+
+        if (other.n === 0) {
+            throw new Error("0では割れません。");
+        }
+
+        return new Fraction(
+            this.n * other.d,
+
+            this.d * other.n
+        );
+    }
+
+
+    equals(other) {
+
+        return (
+            this.n === other.n &&
+            this.d === other.d
+        );
+    }
+
+
+    toString() {
+
+        if (this.d === 1) {
+            return String(this.n);
+        }
+
+        return `${this.n}/${this.d}`;
+    }
+}
+
+
+
+// =====================================================
+// 最大公約数
+// =====================================================
+
+function gcd(a, b) {
+
+    while (b !== 0) {
+
+        const temp = b;
+
+        b = a % b;
+
+        a = temp;
+    }
+
+    return Math.abs(a);
+}
+
+
+
+// =====================================================
+// 入力された文字を分数に変換
+// =====================================================
+
+function parseFraction(input) {
+
+    const text =
+        input.trim();
+
+
+    if (text === "") {
+        throw new Error("値を入力してください。");
+    }
+
+
+    // 「1/2」のような分数
+    if (text.includes("/")) {
+
+        const parts =
+            text.split("/");
+
+
+        if (parts.length !== 2) {
+            throw new Error("分数は「分子/分母」の形で入力してください。");
+        }
+
+
+        const numerator =
+            Number(parts[0].trim());
+
+        const denominator =
+            Number(parts[1].trim());
+
+
+        if (
+            !Number.isInteger(numerator) ||
+            !Number.isInteger(denominator)
+        ) {
+
+            throw new Error(
+                "分数の分子と分母には整数を入力してください。"
+            );
+        }
+
+
+        if (denominator === 0) {
+
+            throw new Error(
+                "分母を0にすることはできません。"
+            );
+        }
+
+
+        return new Fraction(
+            numerator,
+            denominator
+        );
+    }
+
+
+    // 整数
+    const integer =
+        Number(text);
+
+
+    if (Number.isInteger(integer)) {
+
+        return new Fraction(
+            integer,
+            1
+        );
+    }
+
+
+    throw new Error(
+        "整数または分数（例：1/2）を入力してください。"
+    );
+}
+
+
+
+// =====================================================
+// STEP 1
+// =====================================================
+
+let p;
+let q;
+let a1;
+
+let sequence = [];
+
+
+function calculateSequence() {
+
+    const error =
+        document.getElementById(
+            "error-step1"
+        );
+
+
+    error.textContent = "";
+
+
+    try {
+
+        p =
+            parseFraction(
+                document.getElementById("p").value
+            );
+
+
+        q =
+            parseFraction(
+                document.getElementById("q").value
+            );
+
+
+        a1 =
+            parseFraction(
+                document.getElementById("a1").value
+            );
+
+
+        // =============================================
+        // a₁～a₁₀を計算
+        // =============================================
+
+        sequence = [];
+
+        sequence.push(a1);
+
+
+        for (let i = 1; i < 10; i++) {
+
+            const previous =
+                sequence[i - 1];
+
+
+            // aₙ₊₁ = p aₙ + q
+
+            const next =
+                p.multiply(previous)
+                 .add(q);
+
+
+            sequence.push(next);
+        }
+
+
+        // 表示
+        displaySequence();
+
+
+        // STEP 2を表示
+        document
+            .getElementById("step2-card")
+            .classList.remove("hidden");
+
+
+        // 前回の判定結果をリセット
+        document
+            .getElementById("shifted-card")
+            .classList.add("hidden");
+
+
+        document
+            .getElementById("result-card")
+            .classList.add("hidden");
+
+
+        document
+            .getElementById("alpha")
+            .value = "";
+
+
+    } catch (e) {
+
+        error.textContent =
+            e.message;
+    }
+}
+
+
+
+// =====================================================
+// 数列を表示
+// =====================================================
+
+function displaySequence() {
+
+    const card =
+        document.getElementById(
+            "sequence-card"
+        );
+
+    card.classList.remove("hidden");
+
+
+    const nRow =
+        document.getElementById(
+            "n-row"
+        );
+
+
+    const aRow =
+        document.getElementById(
+            "a-row"
+        );
+
+
+    // 以前の表示を削除
+
+    while (nRow.children.length > 1) {
+        nRow.removeChild(
+            nRow.lastChild
+        );
+    }
+
+
+    while (aRow.children.length > 1) {
+        aRow.removeChild(
+            aRow.lastChild
+        );
+    }
+
+
+    // 1～10
+    for (let i = 0; i < 10; i++) {
+
+        const nCell =
+            document.createElement("td");
+
+        nCell.textContent =
+            i + 1;
+
+        nRow.appendChild(nCell);
+
+
+        const aCell =
+            document.createElement("td");
+
+        aCell.className =
+            "value";
+
+        aCell.textContent =
+            sequence[i].toString();
+
+        aRow.appendChild(aCell);
+    }
+}
+
+
+
+// =====================================================
+// STEP 2
+// =====================================================
+
+function checkAlpha() {
+
+    const error =
+        document.getElementById(
+            "error-step2"
+        );
+
+
+    error.textContent = "";
+
+
+    try {
+
+        const alpha =
+            parseFraction(
+                document.getElementById(
+                    "alpha"
+                ).value
+            );
+
+
+        // =============================================
+        // aₙ - α
+        // =============================================
+
+        const shiftedSequence =
+            sequence.map(
+                value =>
+                    value.subtract(alpha)
+            );
+
+
+        // 表示
+
+        displayShiftedSequence(
+            shiftedSequence
+        );
+
+
+        // 判定
+
+        const result =
+            checkGeometricSequence(
+                shiftedSequence
+            );
+
+
+        displayResult(result);
+
+
+    } catch (e) {
+
+        error.textContent =
+            e.message;
+    }
+}
+
+
+
+// =====================================================
+// aₙ - α の表示
+// =====================================================
+
+function displayShiftedSequence(
+    shiftedSequence
+) {
+
+    document
+        .getElementById("shifted-card")
+        .classList.remove("hidden");
+
+
+    const nRow =
+        document.getElementById(
+            "sub-n-row"
+        );
+
+
+    const aRow =
+        document.getElementById(
+            "sub-a-row"
+        );
+
+
+    while (nRow.children.length > 1) {
+
+        nRow.removeChild(
+            nRow.lastChild
+        );
+    }
+
+
+    while (aRow.children.length > 1) {
+
+        aRow.removeChild(
+            aRow.lastChild
+        );
+    }
+
+
+    for (let i = 0; i < 10; i++) {
+
+        const nCell =
+            document.createElement("td");
+
+        nCell.textContent =
+            i + 1;
+
+        nRow.appendChild(nCell);
+
+
+        const aCell =
+            document.createElement("td");
+
+        aCell.className =
+            "value sub-sequence";
+
+        aCell.textContent =
+            shiftedSequence[i].toString();
+
+        aRow.appendChild(aCell);
+    }
+}
+
+
+
+// =====================================================
+// 等比数列判定
+// =====================================================
+
+function checkGeometricSequence(
+    values
+) {
+
+    // 全て0か確認
+
+    const allZero =
+        values.every(
+            value =>
+                value.n === 0
+        );
+
+
+    if (allZero) {
+
+        return {
+            isGeometric: true,
+            ratio: new Fraction(0)
+        };
+    }
+
+
+    // 最初の項が0の場合
+    // 0, ○, ○, ... は等比数列ではない
+
+    if (values[0].n === 0) {
+
+        return {
+            isGeometric: false,
+            ratio: null
+        };
+    }
+
+
+    // 公比
+
+    const ratio =
+        values[1].divide(
+            values[0]
+        );
+
+
+    // すべての隣り合う項を確認
+
+    for (
+        let i = 1;
+        i < values.length - 1;
+        i++
+    ) {
+
+        if (values[i].n === 0) {
+
+            return {
+                isGeometric: false,
+                ratio: null
+            };
+        }
+
+
+        const currentRatio =
+            values[i + 1].divide(
+                values[i]
+            );
+
+
+        if (
+            !currentRatio.equals(
+                ratio
+            )
+        ) {
+
+            return {
+                isGeometric: false,
+                ratio: null
+            };
+        }
+    }
+
+
+    return {
+        isGeometric: true,
+        ratio: ratio
+    };
+}
+
+
+
+// =====================================================
+// 判定結果表示
+// =====================================================
+
+function displayResult(result) {
+
+    document
+        .getElementById("result-card")
+        .classList.remove("hidden");
+
+
+    const mark =
+        document.getElementById(
+            "result-mark"
+        );
+
+
+    const text =
+        document.getElementById(
+            "result-text"
+        );
+
+
+    const ratio =
+        document.getElementById(
+            "ratio"
+        );
+
+
+    const explanation =
+        document.getElementById(
+            "explanation"
+        );
+
+
+    if (result.isGeometric) {
+
+        mark.textContent = "○";
+
+        text.textContent =
+            "等比数列です";
+
+
+        ratio.textContent =
+            "公比：" +
+            result.ratio.toString();
+
+
+        explanation.innerHTML =
+            "隣り合う項の比がすべて等しくなっています。<br>" +
+            "したがって、この数列は等比数列です。";
+
+    } else {
+
+        mark.textContent = "×";
+
+        text.textContent =
+            "等比数列ではありません";
+
+
+        ratio.textContent =
+            "公比：一定ではありません";
+
+
+        explanation.innerHTML =
+            "隣り合う項の比がすべて等しくなっていません。<br>" +
+            "したがって、この数列は等比数列ではありません。";
+    }
+}
+
+</script>
+
+</body>
+</html>
