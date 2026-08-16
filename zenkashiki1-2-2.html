@@ -1,0 +1,2719 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>
+    漸化式を視覚的に理解しよう
+</title>
+
+
+<style>
+
+/* =====================================================
+   全体
+===================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+
+    margin: 0;
+
+    font-family:
+        "Yu Gothic",
+        "Hiragino Kaku Gothic ProN",
+        Meiryo,
+        sans-serif;
+
+    background: #f4f7fb;
+
+    color: #222;
+}
+
+
+.container {
+
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    padding:
+        30px
+        20px
+        60px;
+}
+
+
+h1 {
+
+    text-align: center;
+
+    color: #1f3c88;
+
+    margin-bottom: 10px;
+}
+
+
+.subtitle {
+
+    text-align: center;
+
+    color: #666;
+
+    margin-bottom: 30px;
+}
+
+
+
+/* =====================================================
+   カード
+===================================================== */
+
+.card {
+
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 25px;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 4px 12px
+        rgba(0,0,0,0.08);
+}
+
+
+.step-title {
+
+    color: #1f3c88;
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    margin-bottom: 20px;
+}
+
+
+.formula {
+
+    text-align: center;
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+    margin:
+        15px
+        0
+        25px;
+}
+
+
+
+/* =====================================================
+   入力欄
+===================================================== */
+
+.inputs {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+
+.input-group {
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.input-group label {
+
+    font-weight: bold;
+
+    margin-bottom: 7px;
+}
+
+
+input[type="text"] {
+
+    width: 100%;
+
+    padding: 12px;
+
+    font-size: 18px;
+
+    border:
+        2px solid
+        #ccd4e0;
+
+    border-radius: 8px;
+
+    text-align: center;
+}
+
+
+input[type="text"]:focus {
+
+    outline: none;
+
+    border-color: #3973d9;
+}
+
+
+
+/* =====================================================
+   ボタン
+===================================================== */
+
+.button-area {
+
+    text-align: center;
+
+    margin-top: 25px;
+}
+
+
+button {
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding:
+        13px
+        35px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    color: white;
+
+    margin: 5px;
+}
+
+
+.button-blue {
+
+    background: #3973d9;
+}
+
+
+.button-blue:hover {
+
+    background: #285db8;
+}
+
+
+.button-orange {
+
+    background: #e58b22;
+}
+
+
+.button-orange:hover {
+
+    background: #c96f0c;
+}
+
+
+.button-green {
+
+    background: #2e8b57;
+}
+
+
+.button-green:hover {
+
+    background: #247044;
+}
+
+
+.button-gray {
+
+    background: #777;
+}
+
+
+.button-gray:hover {
+
+    background: #555;
+}
+
+
+
+/* =====================================================
+   表
+===================================================== */
+
+.sequence-table-wrapper {
+
+    overflow-x: auto;
+}
+
+
+table {
+
+    border-collapse: collapse;
+
+    width: 100%;
+
+    min-width: 700px;
+}
+
+
+th,
+td {
+
+    border:
+        1px solid
+        #cbd3df;
+
+    padding:
+        12px
+        15px;
+
+    text-align: center;
+}
+
+
+th {
+
+    background: #eaf0fa;
+}
+
+
+td.value {
+
+    font-size: 18px;
+
+    font-weight: bold;
+}
+
+
+.sub-sequence {
+
+    background: #fff8df;
+}
+
+
+
+/* =====================================================
+   STEP 2
+===================================================== */
+
+.experiment-box {
+
+    background: #f5f8ff;
+
+    border-radius: 12px;
+
+    padding: 25px;
+
+    margin-top: 20px;
+}
+
+
+.experiment-message {
+
+    text-align: center;
+
+    line-height: 1.8;
+
+    margin-bottom: 25px;
+}
+
+
+.slider-title {
+
+    text-align: center;
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
+}
+
+
+.slider-value {
+
+    text-align: center;
+
+    font-size: 32px;
+
+    font-weight: bold;
+
+    color: #e58b22;
+
+    margin-bottom: 20px;
+}
+
+
+input[type="range"] {
+
+    width: 100%;
+
+    cursor: pointer;
+}
+
+
+.slider-scale {
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    color: #777;
+
+    font-size: 13px;
+
+    margin-top: 7px;
+}
+
+
+.slider-note {
+
+    text-align: center;
+
+    color: #666;
+
+    margin-top: 12px;
+
+    font-size: 14px;
+}
+
+
+.alpha-input {
+
+    max-width: 300px;
+
+    margin:
+        25px
+        auto
+        0;
+}
+
+
+
+/* =====================================================
+   判定結果
+===================================================== */
+
+.result {
+
+    text-align: center;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    background: #f1f5ff;
+}
+
+
+.result-mark {
+
+    font-size: 70px;
+
+    font-weight: bold;
+
+    line-height: 1.1;
+}
+
+
+.result-text {
+
+    font-size: 25px;
+
+    font-weight: bold;
+
+    margin-top: 5px;
+}
+
+
+.ratio {
+
+    margin-top: 15px;
+
+    font-size: 18px;
+}
+
+
+
+/* =====================================================
+   発見
+===================================================== */
+
+.discovery {
+
+    display: none;
+
+    margin-top: 25px;
+
+    padding: 25px;
+
+    background: #eef9ee;
+
+    border-radius: 12px;
+
+    border:
+        2px solid
+        #8bc48b;
+}
+
+
+.discovery-title {
+
+    text-align: center;
+
+    font-size: 23px;
+
+    font-weight: bold;
+
+    color: #2e7d32;
+
+    margin-bottom: 20px;
+}
+
+
+.discovery-text {
+
+    text-align: center;
+
+    font-size: 19px;
+
+    line-height: 2;
+}
+
+
+
+/* =====================================================
+   理論値
+===================================================== */
+
+.theory-box {
+
+    display: none;
+
+    margin-top: 25px;
+
+    padding: 25px;
+
+    background: #fff8e8;
+
+    border-radius: 12px;
+
+    border:
+        2px solid
+        #e5b85c;
+
+    text-align: center;
+}
+
+
+.theory-title {
+
+    font-size: 22px;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+
+    color: #9a6800;
+}
+
+
+.theory-formula {
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+    margin: 15px;
+}
+
+
+
+/* =====================================================
+   数式説明
+===================================================== */
+
+.math-box {
+
+    margin-top: 25px;
+
+    background: #fafafa;
+
+    border-radius: 12px;
+
+    padding: 25px;
+
+    text-align: center;
+}
+
+
+.math-line {
+
+    font-size: 22px;
+
+    margin: 12px 0;
+}
+
+
+.highlight {
+
+    font-weight: bold;
+
+    color: #1f3c88;
+}
+
+
+.comparison {
+
+    margin-top: 20px;
+
+    padding: 15px;
+
+    border-radius: 8px;
+
+    background: #eef5ff;
+
+    font-size: 18px;
+
+    line-height: 1.8;
+}
+
+
+
+/* =====================================================
+   エラー
+===================================================== */
+
+.error {
+
+    color: #c62828;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    margin-top: 15px;
+}
+
+
+.info {
+
+    text-align: center;
+
+    color: #555;
+
+    line-height: 1.8;
+}
+
+
+.hidden {
+
+    display: none;
+}
+
+
+
+/* =====================================================
+   スマートフォン
+===================================================== */
+
+@media (max-width: 700px) {
+
+    .inputs {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .formula {
+
+        font-size: 22px;
+    }
+
+
+    .math-line {
+
+        font-size: 18px;
+    }
+
+
+    .theory-formula {
+
+        font-size: 22px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+
+<body>
+
+
+<div class="container">
+
+
+<h1>
+    漸化式を視覚的に理解しよう
+</h1>
+
+
+<div class="subtitle">
+
+    αを動かして、
+    等比数列になる条件を探してみよう
+
+</div>
+
+
+
+<!-- =====================================================
+     STEP 1
+===================================================== -->
+
+<div class="card">
+
+
+<div class="step-title">
+
+    STEP 1　
+    漸化式から数列を作る
+
+</div>
+
+
+<div class="formula">
+
+    a<sub>n+1</sub>
+    =
+    p a<sub>n</sub>
+    +
+    q
+
+</div>
+
+
+
+<div class="inputs">
+
+
+<div class="input-group">
+
+<label for="p">
+    p
+</label>
+
+<input
+    type="text"
+    id="p"
+    value="2"
+    placeholder="例：2、1/2"
+>
+
+</div>
+
+
+
+<div class="input-group">
+
+<label for="q">
+    q
+</label>
+
+<input
+    type="text"
+    id="q"
+    value="3"
+    placeholder="例：3、-3/4"
+>
+
+</div>
+
+
+
+<div class="input-group">
+
+<label for="a1">
+    a₁
+</label>
+
+<input
+    type="text"
+    id="a1"
+    value="1"
+    placeholder="例：1、5/2"
+>
+
+</div>
+
+
+</div>
+
+
+
+<div class="button-area">
+
+<button
+    class="button-blue"
+    onclick="calculateSequence()"
+>
+
+    ① 数列を計算する
+
+</button>
+
+</div>
+
+
+<div
+    id="error-step1"
+    class="error"
+></div>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     数列
+===================================================== -->
+
+<div
+    id="sequence-card"
+    class="card hidden"
+>
+
+
+<h2>
+    数列 {aₙ}
+</h2>
+
+
+<div
+    class="sequence-table-wrapper"
+>
+
+
+<table>
+
+
+<tr id="n-row">
+
+<th>
+    n
+</th>
+
+</tr>
+
+
+<tr id="a-row">
+
+<th>
+    aₙ
+</th>
+
+</tr>
+
+
+</table>
+
+
+</div>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     STEP 2
+===================================================== -->
+
+<div
+    id="step2-card"
+    class="card hidden"
+>
+
+
+<div class="step-title">
+
+    STEP 2　
+    αを動かしてみよう
+
+</div>
+
+
+
+<div class="experiment-message">
+
+<p>
+    αを変えると、
+    <strong>aₙ − α</strong>
+    はどう変化するでしょう？
+</p>
+
+
+<p>
+    スライダーを動かして、
+    <strong>○になるα</strong>
+    を探してみましょう。
+</p>
+
+</div>
+
+
+
+<div class="experiment-box">
+
+
+<div class="slider-title">
+
+    α
+
+</div>
+
+
+
+<div
+    id="slider-value"
+    class="slider-value"
+>
+
+    α = 0
+
+</div>
+
+
+
+<input
+    type="range"
+    id="alpha-slider"
+    min="-100"
+    max="100"
+    step="1"
+    value="0"
+    oninput="alphaSliderChanged()"
+>
+
+
+
+<div class="slider-scale">
+
+<span>
+    小さい
+</span>
+
+<span>
+    0
+</span>
+
+<span>
+    大きい
+</span>
+
+</div>
+
+
+
+<div class="slider-note">
+
+    1目盛り = 1/10
+    （分数も正確に表示されます）
+
+</div>
+
+
+
+<div class="alpha-input">
+
+
+<div class="input-group">
+
+
+<label for="alpha">
+
+    αを直接入力
+
+</label>
+
+
+<input
+    type="text"
+    id="alpha"
+    placeholder="例：-3、2/3、-5/7"
+    oninput="alphaTextChanged()"
+>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<div
+    id="error-step2"
+    class="error"
+></div>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     a_n - α
+===================================================== -->
+
+<div
+    id="shifted-card"
+    class="card hidden"
+>
+
+
+<h2>
+    αを引いた数列
+</h2>
+
+
+<div class="formula">
+
+    b<sub>n</sub>
+    =
+    a<sub>n</sub>
+    −
+    α
+
+</div>
+
+
+
+<div class="sequence-table-wrapper">
+
+
+<table>
+
+
+<tr id="sub-n-row">
+
+<th>
+    n
+</th>
+
+</tr>
+
+
+<tr id="sub-a-row">
+
+<th>
+    aₙ − α
+</th>
+
+</tr>
+
+
+</table>
+
+
+</div>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     結果
+===================================================== -->
+
+<div
+    id="result-card"
+    class="card hidden"
+>
+
+
+<h2>
+    判定結果
+</h2>
+
+
+
+<div class="result">
+
+
+<div
+    id="result-mark"
+    class="result-mark"
+></div>
+
+
+<div
+    id="result-text"
+    class="result-text"
+></div>
+
+
+<div
+    id="ratio"
+    class="ratio"
+></div>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     発見
+===================================================== -->
+
+<div
+    id="discovery"
+    class="discovery"
+>
+
+
+<div class="discovery-title">
+
+    🎉 等比数列になるαを発見しました！
+
+</div>
+
+
+<div
+    id="discovery-text"
+    class="discovery-text"
+></div>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     理論値
+===================================================== -->
+
+<div
+    id="theory-box"
+    class="theory-box"
+>
+
+
+<div class="theory-title">
+
+    🔍 理論上のαを確認してみよう
+
+</div>
+
+
+<div>
+
+    漸化式
+
+</div>
+
+
+<div class="theory-formula">
+
+    a<sub>n+1</sub>
+    =
+    p a<sub>n</sub>
+    +
+    q
+
+</div>
+
+
+<div>
+
+    に対して、
+
+</div>
+
+
+<div class="theory-formula">
+
+    α
+    =
+    <span id="theory-value">
+    </span>
+
+</div>
+
+
+</div>
+
+
+
+<div class="button-area">
+
+
+<button
+    class="button-orange"
+    onclick="showTheory()"
+>
+
+    「理論上のα」を見る
+
+</button>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     数式による説明
+===================================================== -->
+
+<div
+    id="math-explanation"
+    class="math-box hidden"
+>
+
+
+<h3>
+
+    なぜ、このαで
+    等比数列になるのでしょう？
+
+</h3>
+
+
+
+<div class="math-line">
+
+    b<sub>n</sub>
+    =
+    a<sub>n</sub>
+    −
+    α
+
+</div>
+
+
+
+<div class="math-line">
+
+    b<sub>n+1</sub>
+    =
+    a<sub>n+1</sub>
+    −
+    α
+
+</div>
+
+
+
+<div class="math-line">
+
+    =
+    p a<sub>n</sub>
+    +
+    q
+    −
+    α
+
+</div>
+
+
+
+<div class="math-line">
+
+    =
+    p(b<sub>n</sub>+α)
+    +
+    q
+    −
+    α
+
+</div>
+
+
+
+<div class="math-line">
+
+    =
+    p b<sub>n</sub>
+    +
+    <span class="highlight">
+
+        (p−1)α+q
+
+    </span>
+
+</div>
+
+
+
+<hr>
+
+
+
+<div class="math-line">
+
+    等比数列にするためには、
+
+</div>
+
+
+
+<div class="math-line">
+
+    <strong>
+
+        (p−1)α+q=0
+
+    </strong>
+
+</div>
+
+
+
+<div class="math-line">
+
+    よって、
+
+</div>
+
+
+
+<div class="math-line">
+
+    <strong>
+
+        α
+        =
+        <span class="highlight">
+            q/(1−p)
+        </span>
+
+    </strong>
+
+</div>
+
+
+
+<div
+    id="comparison"
+    class="comparison"
+></div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================================
+   Fraction
+===================================================== */
+
+class Fraction {
+
+
+constructor(
+    numerator,
+    denominator = 1
+) {
+
+
+if (denominator === 0) {
+
+    throw new Error(
+        "分母を0にすることはできません。"
+    );
+
+}
+
+
+if (denominator < 0) {
+
+    numerator *= -1;
+
+    denominator *= -1;
+
+}
+
+
+const g =
+    gcd(
+        Math.abs(numerator),
+        Math.abs(denominator)
+    );
+
+
+this.n =
+    numerator / g;
+
+
+this.d =
+    denominator / g;
+
+}
+
+
+
+/* 加法 */
+
+add(other) {
+
+return new Fraction(
+
+    this.n * other.d
+    +
+    other.n * this.d,
+
+    this.d * other.d
+
+);
+
+}
+
+
+
+/* 減法 */
+
+subtract(other) {
+
+return new Fraction(
+
+    this.n * other.d
+    -
+    other.n * this.d,
+
+    this.d * other.d
+
+);
+
+}
+
+
+
+/* 乗法 */
+
+multiply(other) {
+
+return new Fraction(
+
+    this.n * other.n,
+
+    this.d * other.d
+
+);
+
+}
+
+
+
+/* 除法 */
+
+divide(other) {
+
+
+if (other.n === 0) {
+
+    throw new Error(
+        "0では割れません。"
+    );
+
+}
+
+
+return new Fraction(
+
+    this.n * other.d,
+
+    this.d * other.n
+
+);
+
+}
+
+
+
+/* 等しいか */
+
+equals(other) {
+
+return (
+
+    this.n === other.n
+    &&
+    this.d === other.d
+
+);
+
+}
+
+
+
+/* 表示 */
+
+toString() {
+
+if (this.d === 1) {
+
+    return String(this.n);
+
+}
+
+
+return (
+    this.n +
+    "/" +
+    this.d
+);
+
+}
+
+}
+
+
+
+/* =====================================================
+   最大公約数
+===================================================== */
+
+function gcd(a,b) {
+
+
+while (b !== 0) {
+
+    const temp = b;
+
+    b = a % b;
+
+    a = temp;
+
+}
+
+
+return Math.abs(a);
+
+}
+
+
+
+/* =====================================================
+   文字列 → Fraction
+===================================================== */
+
+function parseFraction(input) {
+
+
+const text =
+    input.trim();
+
+
+if (text === "") {
+
+    throw new Error(
+        "値を入力してください。"
+    );
+
+}
+
+
+
+/* 分数 */
+
+if (text.includes("/")) {
+
+
+const parts =
+    text.split("/");
+
+
+if (parts.length !== 2) {
+
+    throw new Error(
+        "分数は「分子/分母」の形で入力してください。"
+    );
+
+}
+
+
+const numerator =
+    Number(
+        parts[0].trim()
+    );
+
+
+const denominator =
+    Number(
+        parts[1].trim()
+    );
+
+
+if (
+    !Number.isInteger(numerator)
+    ||
+    !Number.isInteger(denominator)
+) {
+
+    throw new Error(
+        "分子と分母には整数を入力してください。"
+    );
+
+}
+
+
+if (denominator === 0) {
+
+    throw new Error(
+        "分母を0にすることはできません。"
+    );
+
+}
+
+
+return new Fraction(
+    numerator,
+    denominator
+);
+
+}
+
+
+
+/* 整数 */
+
+const integer =
+    Number(text);
+
+
+if (Number.isInteger(integer)) {
+
+    return new Fraction(
+        integer,
+        1
+    );
+
+}
+
+
+throw new Error(
+    "整数または分数を入力してください。"
+);
+
+}
+
+
+
+/* =====================================================
+   グローバル変数
+===================================================== */
+
+let p;
+let q;
+let a1;
+
+let sequence = [];
+
+
+
+/* =====================================================
+   STEP 1
+===================================================== */
+
+function calculateSequence() {
+
+
+const error =
+    document.getElementById(
+        "error-step1"
+    );
+
+
+error.textContent = "";
+
+
+try {
+
+
+p =
+    parseFraction(
+        document
+            .getElementById("p")
+            .value
+    );
+
+
+q =
+    parseFraction(
+        document
+            .getElementById("q")
+            .value
+    );
+
+
+a1 =
+    parseFraction(
+        document
+            .getElementById("a1")
+            .value
+    );
+
+
+
+sequence = [];
+
+sequence.push(a1);
+
+
+
+for (
+    let i=1;
+    i<10;
+    i++
+) {
+
+
+const next =
+    p
+        .multiply(
+            sequence[i-1]
+        )
+        .add(q);
+
+
+sequence.push(next);
+
+}
+
+
+
+displaySequence();
+
+
+
+document
+    .getElementById(
+        "step2-card"
+    )
+    .classList.remove(
+        "hidden"
+    );
+
+
+document
+    .getElementById(
+        "shifted-card"
+    )
+    .classList.add(
+        "hidden"
+    );
+
+
+document
+    .getElementById(
+        "result-card"
+    )
+    .classList.add(
+        "hidden"
+    );
+
+
+
+/* αを0に戻す */
+
+document
+    .getElementById(
+        "alpha-slider"
+    )
+    .value = 0;
+
+
+document
+    .getElementById(
+        "alpha"
+    )
+    .value = "";
+
+
+updateSliderDisplay();
+
+
+}
+catch(e) {
+
+error.textContent =
+    e.message;
+
+}
+
+}
+
+
+
+/* =====================================================
+   数列表示
+===================================================== */
+
+function displaySequence() {
+
+
+document
+    .getElementById(
+        "sequence-card"
+    )
+    .classList.remove(
+        "hidden"
+    );
+
+
+const nRow =
+    document.getElementById(
+        "n-row"
+    );
+
+
+const aRow =
+    document.getElementById(
+        "a-row"
+    );
+
+
+while (
+    nRow.children.length > 1
+) {
+
+    nRow.removeChild(
+        nRow.lastChild
+    );
+
+}
+
+
+while (
+    aRow.children.length > 1
+) {
+
+    aRow.removeChild(
+        aRow.lastChild
+    );
+
+}
+
+
+
+for (
+    let i=0;
+    i<10;
+    i++
+) {
+
+
+const nCell =
+    document.createElement(
+        "td"
+    );
+
+
+nCell.textContent =
+    i+1;
+
+
+nRow.appendChild(
+    nCell
+);
+
+
+
+const aCell =
+    document.createElement(
+        "td"
+    );
+
+
+aCell.className =
+    "value";
+
+
+aCell.textContent =
+    sequence[i].toString();
+
+
+aRow.appendChild(
+    aCell
+);
+
+}
+
+}
+
+
+
+/* =====================================================
+   理論上のα
+===================================================== */
+
+function getTheoreticalAlpha() {
+
+
+/*
+    α = q / (1-p)
+*/
+
+
+const one =
+    new Fraction(1);
+
+
+/* p = 1 */
+
+if (
+    p.equals(one)
+) {
+
+    return null;
+
+}
+
+
+return q.divide(
+    one.subtract(p)
+);
+
+}
+
+
+
+/* =====================================================
+   スライダー → α
+
+   今回のポイント
+
+   スライダーの値そのものを
+   「α × 10」と考える。
+
+   つまり
+
+   1 → 1/10
+   2 → 1/5
+   3 → 3/10
+   5 → 1/2
+   7 → 7/10
+
+   のようにする。
+===================================================== */
+
+function sliderToFraction() {
+
+
+const value =
+    Number(
+        document
+            .getElementById(
+                "alpha-slider"
+            )
+            .value
+    );
+
+
+return new Fraction(
+    value,
+    10
+);
+
+}
+
+
+
+/* =====================================================
+   α → スライダー
+===================================================== */
+
+function fractionToSlider(
+    alpha
+) {
+
+
+/*
+    α × 10
+*/
+
+
+const value =
+    alpha.n * 10 /
+    alpha.d;
+
+
+return Math.round(value);
+
+}
+
+
+
+/* =====================================================
+   スライダー表示
+===================================================== */
+
+function updateSliderDisplay() {
+
+
+const alpha =
+    sliderToFraction();
+
+
+document
+    .getElementById(
+        "slider-value"
+    )
+    .textContent =
+    "α = " +
+    alpha.toString();
+
+}
+
+
+
+/* =====================================================
+   スライダー操作
+===================================================== */
+
+function alphaSliderChanged() {
+
+
+const alpha =
+    sliderToFraction();
+
+
+document
+    .getElementById(
+        "alpha"
+    )
+    .value =
+    alpha.toString();
+
+
+updateSliderDisplay();
+
+
+checkAlpha();
+
+}
+
+
+
+/* =====================================================
+   α直接入力
+===================================================== */
+
+function alphaTextChanged() {
+
+
+try {
+
+
+const alpha =
+    parseFraction(
+        document
+            .getElementById(
+                "alpha"
+            )
+            .value
+    );
+
+
+const sliderValue =
+    fractionToSlider(
+        alpha
+    );
+
+
+if (
+    sliderValue >= -100
+    &&
+    sliderValue <= 100
+) {
+
+
+document
+    .getElementById(
+        "alpha-slider"
+    )
+    .value =
+    sliderValue;
+
+
+updateSliderDisplay();
+
+}
+
+
+checkAlpha();
+
+
+}
+catch(e) {
+
+    /* 入力途中は無視 */
+
+}
+
+}
+
+
+
+/* =====================================================
+   STEP 2 判定
+===================================================== */
+
+function checkAlpha() {
+
+
+if (
+    sequence.length === 0
+) {
+
+    return;
+
+}
+
+
+const error =
+    document.getElementById(
+        "error-step2"
+    );
+
+
+error.textContent = "";
+
+
+try {
+
+
+const alpha =
+    parseFraction(
+        document
+            .getElementById(
+                "alpha"
+            )
+            .value
+    );
+
+
+const shiftedSequence =
+    sequence.map(
+        value =>
+            value.subtract(
+                alpha
+            )
+    );
+
+
+displayShiftedSequence(
+    shiftedSequence
+);
+
+
+const result =
+    checkGeometricSequence(
+        shiftedSequence
+    );
+
+
+displayResult(
+    result,
+    alpha
+);
+
+
+}
+catch(e) {
+
+    error.textContent =
+        e.message;
+
+}
+
+}
+
+
+
+/* =====================================================
+   a_n - α
+===================================================== */
+
+function displayShiftedSequence(
+    values
+) {
+
+
+document
+    .getElementById(
+        "shifted-card"
+    )
+    .classList.remove(
+        "hidden"
+    );
+
+
+const nRow =
+    document.getElementById(
+        "sub-n-row"
+    );
+
+
+const aRow =
+    document.getElementById(
+        "sub-a-row"
+    );
+
+
+while (
+    nRow.children.length > 1
+) {
+
+    nRow.removeChild(
+        nRow.lastChild
+    );
+
+}
+
+
+while (
+    aRow.children.length > 1
+) {
+
+    aRow.removeChild(
+        aRow.lastChild
+    );
+
+}
+
+
+
+for (
+    let i=0;
+    i<10;
+    i++
+) {
+
+
+const nCell =
+    document.createElement(
+        "td"
+    );
+
+
+nCell.textContent =
+    i+1;
+
+
+nRow.appendChild(
+    nCell
+);
+
+
+
+const aCell =
+    document.createElement(
+        "td"
+    );
+
+
+aCell.className =
+    "value sub-sequence";
+
+
+aCell.textContent =
+    values[i].toString();
+
+
+aRow.appendChild(
+    aCell
+);
+
+}
+
+}
+
+
+
+/* =====================================================
+   等比数列判定
+===================================================== */
+
+function checkGeometricSequence(
+    values
+) {
+
+
+/*
+    全て0の場合
+*/
+
+const allZero =
+    values.every(
+        value =>
+            value.n === 0
+    );
+
+
+if (allZero) {
+
+    return {
+
+        isGeometric: true,
+
+        ratio:
+            new Fraction(0)
+
+    };
+
+}
+
+
+
+/*
+    第1項が0の場合
+*/
+
+if (
+    values[0].n === 0
+) {
+
+    return {
+
+        isGeometric: false,
+
+        ratio: null
+
+    };
+
+}
+
+
+
+/*
+    公比
+*/
+
+const ratio =
+    values[1]
+        .divide(
+            values[0]
+        );
+
+
+
+for (
+    let i=1;
+    i<values.length-1;
+    i++
+) {
+
+
+if (
+    values[i].n === 0
+) {
+
+    return {
+
+        isGeometric: false,
+
+        ratio: null
+
+    };
+
+}
+
+
+const currentRatio =
+    values[i+1]
+        .divide(
+            values[i]
+        );
+
+
+if (
+    !currentRatio.equals(
+        ratio
+    )
+) {
+
+    return {
+
+        isGeometric: false,
+
+        ratio: null
+
+    };
+
+}
+
+}
+
+
+
+return {
+
+    isGeometric: true,
+
+    ratio: ratio
+
+};
+
+}
+
+
+
+/* =====================================================
+   結果表示
+===================================================== */
+
+function displayResult(
+    result,
+    alpha
+) {
+
+
+document
+    .getElementById(
+        "result-card"
+    )
+    .classList.remove(
+        "hidden"
+    );
+
+
+const mark =
+    document.getElementById(
+        "result-mark"
+    );
+
+
+const text =
+    document.getElementById(
+        "result-text"
+    );
+
+
+const ratio =
+    document.getElementById(
+        "ratio"
+    );
+
+
+const discovery =
+    document.getElementById(
+        "discovery"
+    );
+
+
+const math =
+    document.getElementById(
+        "math-explanation"
+    );
+
+
+
+if (
+    result.isGeometric
+) {
+
+
+mark.textContent =
+    "○";
+
+
+text.textContent =
+    "等比数列です";
+
+
+ratio.textContent =
+    "公比：" +
+    result.ratio.toString();
+
+
+discovery.style.display =
+    "block";
+
+
+discovery.innerHTML = `
+
+<div class="discovery-title">
+
+    🎉 等比数列になるαを発見しました！
+
+</div>
+
+<div class="discovery-text">
+
+    あなたが見つけた値は
+
+    <br>
+
+    <strong>
+        α = ${alpha.toString()}
+    </strong>
+
+    <br>
+
+    です。
+
+</div>
+
+`;
+
+
+math.classList.remove(
+    "hidden"
+);
+
+
+updateComparison(
+    alpha
+);
+
+
+
+}
+else {
+
+
+mark.textContent =
+    "×";
+
+
+text.textContent =
+    "等比数列ではありません";
+
+
+ratio.textContent =
+    "公比：一定ではありません";
+
+
+discovery.style.display =
+    "none";
+
+
+math.classList.add(
+    "hidden"
+);
+
+}
+
+}
+
+
+
+/* =====================================================
+   理論値表示
+===================================================== */
+
+function showTheory() {
+
+
+const theoryBox =
+    document.getElementById(
+        "theory-box"
+    );
+
+
+const theoryValue =
+    document.getElementById(
+        "theory-value"
+    );
+
+
+const theoreticalAlpha =
+    getTheoreticalAlpha();
+
+
+theoryBox.style.display =
+    "block";
+
+
+if (
+    theoreticalAlpha === null
+) {
+
+
+theoryValue.textContent =
+    "特定のαはありません";
+
+
+}
+else {
+
+
+theoryValue.textContent =
+    theoreticalAlpha.toString();
+
+}
+
+}
+
+
+
+/* =====================================================
+   理論値との比較
+===================================================== */
+
+function updateComparison(
+    foundAlpha
+) {
+
+
+const comparison =
+    document.getElementById(
+        "comparison"
+    );
+
+
+const theoreticalAlpha =
+    getTheoreticalAlpha();
+
+
+if (
+    theoreticalAlpha === null
+) {
+
+
+comparison.innerHTML =
+
+    "p = 1 のため、" +
+    "通常の方法では特定のαを求めることができません。";
+
+    return;
+
+}
+
+
+
+if (
+    foundAlpha.equals(
+        theoreticalAlpha
+    )
+) {
+
+
+comparison.innerHTML = `
+
+<strong>
+    🎯 一致しました！
+</strong>
+
+<br>
+
+あなたが実験によって見つけた
+
+<strong>
+    α = ${foundAlpha.toString()}
+</strong>
+
+と、
+
+<br>
+
+計算によって求めた
+
+<strong>
+    α = ${theoreticalAlpha.toString()}
+</strong>
+
+は同じ値です。
+
+`;
+
+
+}
+else {
+
+
+comparison.innerHTML = `
+
+あなたが見つけた
+
+<strong>
+    α = ${foundAlpha.toString()}
+</strong>
+
+と、
+
+<br>
+
+理論上の
+
+<strong>
+    α = ${theoreticalAlpha.toString()}
+</strong>
+
+は一致していません。
+
+`;
+
+}
+
+}
+
+
+
+/* =====================================================
+   初期表示
+===================================================== */
+
+window.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        updateSliderDisplay();
+
+    }
+);
+
+
+</script>
+
+
+</body>
+
+</html>
